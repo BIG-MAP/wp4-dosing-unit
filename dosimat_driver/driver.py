@@ -108,7 +108,7 @@ class Response(str, Enum):
 class Dosimat876:
     def __init__(self, port: str):
         self._serial = SerialDriver(port)
-        self._logger = logging.getLogger(__class__)
+        self._logger = logging.getLogger(__class__.__name__)
 
     def dispense(self, ml: float) -> Response:
         # Create the method and load it into the dosing unit
