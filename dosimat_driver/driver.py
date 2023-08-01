@@ -2,31 +2,7 @@ import logging
 import time
 from enum import Enum
 
-import serial
-
-
-class SerialDriver:
-    def __init__(self, port: str):
-        self.serial = serial.Serial(
-            port=port,
-            baudrate=19200,
-            bytesize=serial.EIGHTBITS,
-            parity=serial.PARITY_NONE,
-            stopbits=serial.STOPBITS_ONE,
-            xonxoff=True,  # Software-Handshake
-            rtscts=False,
-            dsrdtr=False,
-        )
-        time.sleep(1)
-
-    def send_command(self, command: str) -> str:
-        self.serial.write((command + "\r\n").encode())
-        self.serial.flush()
-        response = self.serial.readline().decode().strip()
-        return response
-
-    def close(self):
-        self.serial.close()
+from dosimat_driver.serial_driver import SerialDriver
 
 
 class Variable(str, Enum):
@@ -45,6 +21,10 @@ class Variable(str, Enum):
 
 
 class Command:
+    """
+    Helper class to create Dosimat serial commands using static functions.
+    """
+
     @staticmethod
     def start_or_continue() -> str:
         return "$G"
@@ -76,6 +56,10 @@ class Command:
 
 
 class Status(str, Enum):
+    """
+    Dosimat device status.
+    """
+
     READY = "Ready;0"
     BUSY = "Busy;0"
     HOLD = "Hold;0"
@@ -89,6 +73,10 @@ class Status(str, Enum):
 
 
 class Response(str, Enum):
+    """
+    Response received after a serial command.
+    """
+
     OK = "OK"
     E1 = "Method not found"
     E2 = "Invalid variable"
@@ -110,8 +98,11 @@ class Dosimat876:
         self._serial = SerialDriver(port)
         self._logger = logging.getLogger(__class__.__name__)
 
-    def dispense(self, ml: float) -> Response:
-        # Create the method and load it into the dosing unit
+    def _load_method(self, ml: float):
+        """
+        Load the method into the dosing unit.
+        Method must be created in the device beforehand.
+        """
         load_command = Command.load_method(name=f"{ml}ml-XDOS")
         response = self._serial.send_command(load_command)
         response = Response.from_string(response)
@@ -119,10 +110,13 @@ class Dosimat876:
         if response != Response.OK:
             raise RuntimeError(f"Could not finish command {load_command}: {response}")
 
-        # Dispense the amount
-        self._serial.send_command(Command.start_or_continue())
+    def _dispense(self):
+        response = self._serial.send_command(Command.start_or_continue())
+        response = Response.from_string(response)
+        if response != Response.OK:
+            raise RuntimeError(f"Could not start dispensing: {response}")
 
-        # Wait till the status is ready
+    def _wait_until_done(self, timeout: int = 60):
         while True:
             status = self._serial.send_command(Command.status())
             status = Status.from_string(status)
@@ -130,6 +124,14 @@ class Dosimat876:
             if status == Status.READY:
                 break
             time.sleep(1)
+            timeout -= 1
+            if timeout == 0:
+                raise RuntimeError(f"Timeout of {timeout} seconds reached")
+
+    def dispense(self, ml: float) -> Response:
+        self._load_method(ml=ml)
+        self._dispense()
+        self._wait_until_done
 
     def close(self):
         self._serial.close()
