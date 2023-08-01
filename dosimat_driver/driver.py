@@ -116,6 +116,8 @@ class Dosimat876:
         response = self._serial.send_command(load_command)
         response = Response.from_string(response)
         self._logger.info(f"Response from {load_command}: {response}")
+        if response != Response.OK:
+            raise RuntimeError(f"Could not finish command {load_command}: {response}")
 
         # Dispense the amount
         self._serial.send_command(Command.start_or_continue())
