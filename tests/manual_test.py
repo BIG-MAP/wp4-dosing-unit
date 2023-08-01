@@ -1,4 +1,4 @@
-from driver.driver import Dosimat876
+from dosimat_driver.driver import Dosimat876
 
 serial_port = "/dev/ttyUSB0"
 

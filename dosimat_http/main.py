@@ -3,7 +3,7 @@ import os
 
 from fastapi import FastAPI
 
-from driver.driver import Dosimat876
+from dosimat_driver.driver import Dosimat876
 
 serial_port = os.environ.get("SERIAL_PORT", "/dev/ttyUSB0")
 dosimat = Dosimat876(serial_port)
