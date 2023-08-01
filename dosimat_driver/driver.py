@@ -129,9 +129,12 @@ class Dosimat876:
                 raise RuntimeError(f"Timeout of {timeout} seconds reached")
 
     def dispense(self, ml: float) -> Response:
-        self._load_method(ml=ml)
-        self._dispense()
-        self._wait_until_done
+        try:
+            self._load_method(ml=ml)
+            self._dispense()
+            self._wait_until_done
+        except Exception as e:
+            self._logger.exception(e)
 
     def close(self):
         self._serial.close()
