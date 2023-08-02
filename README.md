@@ -26,3 +26,17 @@ To start an HTTP server, run:
 ```bash
 SERIAL_PORT_1=/dev/ttyUSB0 uvicorn dosimat_http.main:app --host "0.0.0.0" --port 8080
 ```
+
+It's expected to have 6 dosing units connected together through LogiLink. Specify environment variables `SERIAL_PORT_1` to `SERIAL_PORT_6` to configure the serial ports, e.g., `SERIAL_PORT_1=/dev/ttyUSB0`.
+
+To query the status of the dosing units, run:
+
+```bash
+curl "http://localhost:8080/dosimats/1/status"
+```
+
+To dispense 10 ml of liquid from the dosing unit 1, run:
+
+```bash
+curl -X POST "http://localhost:8080/dosimats/1/dispense?ml=10"
+```
