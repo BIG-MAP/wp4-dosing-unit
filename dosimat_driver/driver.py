@@ -97,6 +97,7 @@ class Dosimat876:
     def __init__(self, port: str):
         self._serial = SerialDriver(port)
         self._logger = logging.getLogger(__class__.__name__)
+        self._locked = False  # Don't allow to run multiple commands at once on the device by locking it
 
     def _load_method(self, ml: float):
         """
@@ -134,12 +135,18 @@ class Dosimat876:
         The corresponding function must exist in the device.
         It must be named "{ml}ml-XDOS". Use dot as the decimal separator.
         """
+        if self._locked:
+            raise RuntimeError("Dosing unit is busy")
+
         try:
+            self._locked = True
             self._load_method(ml=ml)
             self._dispense()
             self._wait_until_done()
         except Exception as e:
             self._logger.exception(e)
+        finally:
+            self._locked = False
 
     def close(self):
         self._serial.close()
