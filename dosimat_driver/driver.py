@@ -1,6 +1,7 @@
 import logging
 import time
 from enum import Enum
+from typing import Union
 
 from dosimat_driver.serial_driver import SerialDriver
 
@@ -109,7 +110,7 @@ class Dosimat876:
         status = self._get_status()
         return True if status == Status.READY else False
 
-    def dispense(self, ml: float):
+    def dispense(self, ml: Union[float, int]):
         """
         Dispense the given volume of liquid.
         The corresponding function must exist in the device.
@@ -128,7 +129,7 @@ class Dosimat876:
         finally:
             self._locked = False
 
-    def _load_method(self, ml: float):
+    def _load_method(self, ml: Union[float, int]):
         """
         Load the method into the dosing unit.
         Method must be created in the device beforehand.

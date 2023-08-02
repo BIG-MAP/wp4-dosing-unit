@@ -1,5 +1,5 @@
 import os
-from typing import Optional
+from typing import Optional, Union
 
 from dosimat_driver.driver import Dosimat876
 
@@ -63,7 +63,7 @@ class DosimatManager:
         """
         return self.dosimats[id - 1]
 
-    def dispense(self, id: int, ml: float):
+    def dispense(self, id: int, ml: Union[float, int]):
         """
         Dispenses the given volume of liquid.
         """

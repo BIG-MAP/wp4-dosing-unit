@@ -44,6 +44,11 @@ async def dispense(
     """
     Dispenses the given volume of liquid.
     """
+    # We need to convert the ml to an integer if it is a whole number, because Dosimat method names
+    # don't expect decimals for whole numbers. It depends, however, on how the Dosimat is configured.
+    if ml.is_integer():
+        ml = int(ml)
+
     try:
         background_tasks.add_task(app.state.dosimat_manager.dispense, id, ml)
         return APIResponse(message="Dispensing successful")
