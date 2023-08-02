@@ -61,7 +61,7 @@ class DosimatManager:
         Returns the dosing unit with the given ID.
         ID starts at 1.
         """
-        return self.dosimats.get(id - 1)
+        return self.dosimats[id - 1]
 
     def dispense(self, id: int, ml: Union[float, int]):
         """
