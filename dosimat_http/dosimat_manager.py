@@ -28,7 +28,7 @@ class DosimatManager:
 
         serial_ports = list(
             filter(
-                lambda port: port is not None,
+                lambda port: port is not None and port != "",
                 [
                     serial_port_1,
                     serial_port_2,
