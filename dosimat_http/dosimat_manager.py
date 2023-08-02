@@ -61,7 +61,10 @@ class DosimatManager:
         Returns the dosing unit with the given ID.
         ID starts at 1.
         """
-        return self.dosimats[id - 1]
+        try:
+            return self.dosimats[id - 1]
+        except IndexError:
+            return None
 
     def dispense(self, id: int, ml: Union[float, int]):
         """
@@ -78,3 +81,13 @@ class DosimatManager:
         Returns a list of IDs of the dosing units.
         """
         return list(range(1, len(self.dosimats) + 1))
+
+    def stop(self, id: int):
+        """
+        Stops the dosing unit.
+        """
+        dosimat = self.get_unit(id)
+        if dosimat is None:
+            raise ValueError(f"Could not find dosimat with id {id}")
+
+        dosimat.stop()

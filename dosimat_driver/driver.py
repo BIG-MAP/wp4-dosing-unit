@@ -129,6 +129,14 @@ class Dosimat876:
         finally:
             self._locked = False
 
+    def stop(self):
+        """
+        Stop the current operation.
+        """
+        response = self._get_response_for_command(Command.stop())
+        if response != Response.OK:
+            raise RuntimeError(f"Could not stop: {response}")
+
     def _load_method(self, ml: Union[float, int]):
         """
         Load the method into the dosing unit.

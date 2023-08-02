@@ -71,20 +71,35 @@ async def dispense(id: int, ml: float, background_tasks: BackgroundTasks):
             content=APIResponse(error=f"Could not find dosimat with id {id}"),
         )
 
-    is_ready = dosimat.is_ready()
-    if not is_ready:
-        return JSONResponse(
-            status_code=400,
-            content=APIResponse(error=f"Dosimat with id {id} is not ready"),
-        )
-
     try:
         background_tasks.add_task(app.state.dosimat_manager.dispense, id, ml)
-        return APIResponse(message="Dispensing successful")
+        return APIResponse(message="Dispense request accepted")
     except Exception as e:
         return JSONResponse(
             status_code=500,
             content=APIResponse(error=f"Could not dispense: {e}"),
+        )
+
+
+@app.post("/dosimats/{id}/stop", status_code=202)
+async def stop(id: int, background_tasks: BackgroundTasks):
+    """
+    Stops the dosing unit.
+    """
+    dosimat = app.state.dosimat_manager.get_unit(id)
+    if dosimat is None:
+        return JSONResponse(
+            status_code=404,
+            content=APIResponse(error=f"Could not find dosimat with id {id}"),
+        )
+
+    try:
+        background_tasks.add_task(app.state.dosimat_manager.stop, id)
+        return APIResponse(message="Stop request accepted")
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content=APIResponse(error=f"Could not stop: {e}"),
         )
 
 
