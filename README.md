@@ -20,3 +20,9 @@ python setup.py install
 # Run the manual test
 python tests/manual_driver_test.py
 ```
+
+To start an HTTP server, run:
+
+```bash
+SERIAL_PORT_1=/dev/ttyUSB0 uvicorn dosimat_http.main:app --host "0.0.0.0" --port 8080
+```
