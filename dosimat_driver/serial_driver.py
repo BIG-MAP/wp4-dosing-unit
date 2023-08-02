@@ -1,7 +1,6 @@
-import serial
-
-
 import time
+
+import serial
 
 
 class SerialDriver:
@@ -21,8 +20,11 @@ class SerialDriver:
     def send_command(self, command: str) -> str:
         self.serial.write((command + "\r\n").encode())
         self.serial.flush()
-        response = self.serial.readline().decode().strip()
+        response = self.read_line()
         return response
+
+    def read_line(self) -> str:
+        return self.serial.readline().decode().strip()
 
     def close(self):
         self.serial.close()

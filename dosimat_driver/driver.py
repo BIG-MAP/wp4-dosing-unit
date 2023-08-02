@@ -43,6 +43,14 @@ class Command:
         return "$D"
 
     @staticmethod
+    def confirm_ok() -> str:
+        return "$A(OK)"
+
+    @staticmethod
+    def confirm_cancel() -> str:
+        return "$A(CANCEL)"
+
+    @staticmethod
     def load_method(name: str) -> str:
         return f"$L({name})"
 
@@ -166,7 +174,12 @@ class Dosimat876:
 
     def _get_status(self) -> Status:
         response = self._serial.send_command(Command.status())
-        return Status.from_string(response)
+        response = Response.from_string(response)
+        if response != Response.OK:
+            raise RuntimeError(f"Could not get status: {response}")
+
+        status = self._serial.read_line()
+        return Status.from_string(status)
 
     def _get_response_for_command(self, command: str) -> Response:
         response = self._serial.send_command(command)
