@@ -1,12 +1,10 @@
 import logging
-import os
+from dataclasses import dataclass
+from typing import Any, Optional
 
-from fastapi import FastAPI
+from fastapi import BackgroundTasks, FastAPI
 
-from dosimat_driver.driver import Dosimat876
-
-serial_port = os.environ.get("SERIAL_PORT", "/dev/ttyUSB0")
-dosimat = Dosimat876(serial_port)
+from dosimat_http.dosimat_manager import DosimatManager
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -14,61 +12,43 @@ logger.setLevel(logging.INFO)
 
 def lifespan(app: FastAPI):
     yield
-    app.state.logger.info("Shutting down the dosing unit")
-    app.state.dosimat.close()
+    app.state.logger.info("Shutting down the dosing manager units")
+    app.state.dosimat_manager.close()
 
 
 app = FastAPI(lifespan=lifespan)
-app.state.dosimat = dosimat
+app.state.dosimat_manager = DosimatManager()
 app.state.logger = logger
 
 
-@app.get("/start")
-def start():
-    return {"response": app.state.dosimat.send_command("$G")}
+@dataclass
+class APIResponse:
+    data: Optional[Any] = None
+    message: Optional[str] = None
+    error: Optional[str] = None
 
 
-@app.get("/stop")
-def stop():
-    return {"response": app.state.dosimat.send_command("$S")}
+@app.get("/dosimats/{id}/status")
+async def get_status(id: int) -> APIResponse:
+    """
+    Returns the status of the dosing unit.
+    """
+    is_ready = app.state.dosimat_manager.get_unit(id).is_ready()
+    return APIResponse(data={"is_ready": is_ready})
 
 
-@app.get("/hold")
-def hold():
-    return {"response": app.state.dosimat.send_command("$H")}
-
-
-@app.get("/status")
-def status():
-    return {"response": app.state.dosimat.send_command("$D")}
-
-
-@app.get("/confirm/{action}")
-def confirm(action: str):
-    return {"response": app.state.dosimat.send_command(f"$A({action.upper()})")}
-
-
-@app.get("/load/{method}")
-def load(method: str):
-    return {"response": app.state.dosimat.send_command(f"$L({method})")}
-
-
-@app.get("/request/{variable}")
-def request(variable: str):
-    return {"response": app.state.dosimat.send_command(f"$Q({variable.upper()})")}
-
-
-@app.post("/dispense/{ml}")
-def dispense(ml: float):
-    method_name = f"{ml}ml-XDOS"
-    app.state.dosimat.send_command(f"$L({method_name})")
-    app.state.dosimat.send_command("$G")
-    return {"response": "Dispensing started"}
-
-
-@app.on_event("shutdown")
-def shutdown_event():
-    app.state.dosimat.close()
+@app.post("/dosimats/{id}/dispense", status_code=202)
+async def dispense(
+    id: int, ml: float, background_tasks: BackgroundTasks
+) -> APIResponse:
+    """
+    Dispenses the given volume of liquid.
+    """
+    try:
+        background_tasks.add_task(app.state.dosimat_manager.dispense, id, ml)
+        return APIResponse(message="Dispensing successful")
+    except Exception as e:
+        return APIResponse(error=str(e))
 
 
 if __name__ == "__main__":

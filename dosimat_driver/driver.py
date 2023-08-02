@@ -109,7 +109,7 @@ class Dosimat876:
         status = self._get_status()
         return True if status == Status.READY else False
 
-    def dispense(self, ml: float) -> Response:
+    def dispense(self, ml: float):
         """
         Dispense the given volume of liquid.
         The corresponding function must exist in the device.
