@@ -99,35 +99,15 @@ class Dosimat876:
         self._logger = logging.getLogger(__class__.__name__)
         self._locked = False  # Don't allow to run multiple commands at once on the device by locking it
 
-    def _load_method(self, ml: float):
-        """
-        Load the method into the dosing unit.
-        Method must be created in the device beforehand.
-        """
-        load_command = Command.load_method(name=f"{ml}ml-XDOS")
-        response = self._serial.send_command(load_command)
-        response = Response.from_string(response)
-        self._logger.info(f"Response from {load_command}: {response}")
-        if response != Response.OK:
-            raise RuntimeError(f"Could not finish command {load_command}: {response}")
+    def close(self):
+        self._serial.close()
 
-    def _dispense(self):
-        response = self._serial.send_command(Command.start_or_continue())
-        response = Response.from_string(response)
-        if response != Response.OK:
-            raise RuntimeError(f"Could not start dispensing: {response}")
-
-    def _wait_until_done(self, timeout: int = 60):
-        while True:
-            status = self._serial.send_command(Command.status())
-            status = Status.from_string(status)
-            self._logger.info(f"Status: {status}")
-            if status == Status.READY:
-                break
-            time.sleep(1)
-            timeout -= 1
-            if timeout == 0:
-                raise RuntimeError(f"Timeout of {timeout} seconds reached")
+    def is_ready(self) -> bool:
+        """
+        Returns True if the device is available.
+        """
+        status = self._get_status()
+        return True if status == Status.READY else False
 
     def dispense(self, ml: float) -> Response:
         """
@@ -148,5 +128,37 @@ class Dosimat876:
         finally:
             self._locked = False
 
-    def close(self):
-        self._serial.close()
+    def _load_method(self, ml: float):
+        """
+        Load the method into the dosing unit.
+        Method must be created in the device beforehand.
+        """
+        load_command = Command.load_method(name=f"{ml}ml-XDOS")
+        response = self._get_response_for_command(load_command)
+        self._logger.info(f"Response from {load_command}: {response}")
+        if response != Response.OK:
+            raise RuntimeError(f"Could not finish command {load_command}: {response}")
+
+    def _dispense(self):
+        response = self._get_response_for_command(Command.start_or_continue())
+        if response != Response.OK:
+            raise RuntimeError(f"Could not start dispensing: {response}")
+
+    def _wait_until_done(self, timeout: int = 60):
+        while True:
+            status = self._get_status()
+            self._logger.info(f"Status: {status}")
+            if status == Status.READY:
+                break
+            time.sleep(1)
+            timeout -= 1
+            if timeout == 0:
+                raise RuntimeError(f"Timeout of {timeout} seconds reached")
+
+    def _get_status(self) -> Status:
+        response = self._serial.send_command(Command.status())
+        return Status.from_string(response)
+
+    def _get_response_for_command(self, command: str) -> Response:
+        response = self._serial.send_command(command)
+        return Response.from_string(response)
