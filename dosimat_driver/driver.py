@@ -129,6 +129,11 @@ class Dosimat876:
                 raise RuntimeError(f"Timeout of {timeout} seconds reached")
 
     def dispense(self, ml: float) -> Response:
+        """
+        Dispense the given volume of liquid.
+        The corresponding function must exist in the device.
+        It must be named "{ml}ml-XDOS". Use dot as the decimal separator.
+        """
         try:
             self._load_method(ml=ml)
             self._dispense()
