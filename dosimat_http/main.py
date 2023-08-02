@@ -28,12 +28,25 @@ class APIResponse:
     error: Optional[str] = None
 
 
+@app.get("/dosimats")
+async def list_dosimats() -> APIResponse:
+    """
+    Returns a list of dosing units.
+    """
+    dosimat_ids = app.state.dosimat_manager.get_ids()
+    return APIResponse(data={"dosimat_ids": dosimat_ids})
+
+
 @app.get("/dosimats/{id}/status")
 async def get_status(id: int) -> APIResponse:
     """
     Returns the status of the dosing unit.
     """
-    is_ready = app.state.dosimat_manager.get_unit(id).is_ready()
+    dosimat = app.state.dosimat_manager.get_unit(id)
+    if dosimat is None:
+        return APIResponse(error=f"Could not find dosimat with id {id}")
+
+    is_ready = dosimat.is_ready()
     return APIResponse(data={"is_ready": is_ready})
 
 

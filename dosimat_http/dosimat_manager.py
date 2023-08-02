@@ -56,15 +56,25 @@ class DosimatManager:
         for dosimat in self.dosimats:
             dosimat.close()
 
-    def get_unit(self, id: int) -> Dosimat876:
+    def get_unit(self, id: int) -> Optional[Dosimat876]:
         """
         Returns the dosing unit with the given ID.
         ID starts at 1.
         """
-        return self.dosimats[id - 1]
+        return self.dosimats.get(id - 1)
 
     def dispense(self, id: int, ml: Union[float, int]):
         """
         Dispenses the given volume of liquid.
         """
-        self.get_unit(id).dispense(ml)
+        dosimat = self.get_unit(id)
+        if dosimat is None:
+            raise ValueError(f"Could not find dosimat with id {id}")
+
+        dosimat.dispense(ml)
+
+    def get_ids(self) -> list[int]:
+        """
+        Returns a list of IDs of the dosing units.
+        """
+        return list(range(1, len(self.dosimats) + 1))
