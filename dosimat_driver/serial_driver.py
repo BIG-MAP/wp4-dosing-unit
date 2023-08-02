@@ -14,7 +14,7 @@ class SerialDriver:
             xonxoff=True,  # Software-Handshake
             rtscts=False,
             dsrdtr=False,
-            timeout=5,
+            timeout=2,
             exclusive=True,
         )
         time.sleep(1)
@@ -22,7 +22,8 @@ class SerialDriver:
     def send_command(self, command: str) -> str:
         self.serial.write((command + "\r\n").encode())
         self.serial.flush()
-        response = self.serial.read_all().decode().strip()
+        lines = self.serial.readlines()
+        response = lines[-1].decode().strip()
         return response
 
     def read_line(self) -> str:

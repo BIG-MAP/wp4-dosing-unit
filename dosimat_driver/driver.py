@@ -115,6 +115,9 @@ class Dosimat876:
         """
         Returns True if the device is available.
         """
+        if self._locked:
+            return False
+
         status = self._get_status()
         return True if status == Status.READY else False
 
@@ -173,11 +176,9 @@ class Dosimat876:
                 raise RuntimeError(f"Timeout of {timeout} seconds reached")
 
     def _get_status(self) -> Status:
-        self._serial.serial.reset_output_buffer()
         response = self._serial.send_command(Command.status())
         return Status.from_string(response)
 
     def _get_response_for_command(self, command: str) -> Response:
-        self._serial.serial.reset_output_buffer()
         response = self._serial.send_command(command)
         return Response.from_string(response)

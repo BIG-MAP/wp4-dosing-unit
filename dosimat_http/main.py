@@ -74,6 +74,13 @@ async def dispense(id: int, ml: float, background_tasks: BackgroundTasks):
             content=APIResponse(error=f"Could not find dosimat with id {id}").json(),
         )
 
+    is_ready = dosimat.is_ready()
+    if not is_ready:
+        return JSONResponse(
+            status_code=400,
+            content=APIResponse(error=f"Dosimat with id {id} is busy").json(),
+        )
+
     try:
         background_tasks.add_task(app.state.dosimat_manager.dispense, id, ml)
         return APIResponse(message="Dispense request accepted")
