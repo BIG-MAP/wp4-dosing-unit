@@ -1,6 +1,6 @@
 import logging
 from dataclasses import dataclass
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 from fastapi import BackgroundTasks, FastAPI
 from fastapi.responses import JSONResponse

@@ -19,12 +19,12 @@ class DosimatManager:
         Returns a list of serial ports to use provided by the environment variables.
         """
 
-        serial_port_1: Optional[str] = os.environ.get("SERIAL_PORT_1", "/dev/ttyUSB0")
-        serial_port_2: Optional[str] = os.environ.get("SERIAL_PORT_2", "/dev/ttyUSB1")
-        serial_port_3: Optional[str] = os.environ.get("SERIAL_PORT_3", "/dev/ttyUSB2")
-        serial_port_4: Optional[str] = os.environ.get("SERIAL_PORT_4", "/dev/ttyUSB3")
-        serial_port_5: Optional[str] = os.environ.get("SERIAL_PORT_5", "/dev/ttyUSB4")
-        serial_port_6: Optional[str] = os.environ.get("SERIAL_PORT_6", "/dev/ttyUSB5")
+        serial_port_1: Optional[str] = os.environ.get("SERIAL_PORT_1")
+        serial_port_2: Optional[str] = os.environ.get("SERIAL_PORT_2")
+        serial_port_3: Optional[str] = os.environ.get("SERIAL_PORT_3")
+        serial_port_4: Optional[str] = os.environ.get("SERIAL_PORT_4")
+        serial_port_5: Optional[str] = os.environ.get("SERIAL_PORT_5")
+        serial_port_6: Optional[str] = os.environ.get("SERIAL_PORT_6")
 
         serial_ports = list(
             filter(
