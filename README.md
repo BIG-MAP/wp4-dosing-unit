@@ -7,7 +7,7 @@ This repository contains:
 
 ## Getting Started
 
-We use the obsolete way of installing Python packages using `setup.py` to avoid issues with the missing Rust compiler for the cryptography package.
+We use the obsolete way of installing Python packages using `setup.py` to avoid issues with the missing Rust compiler for the cryptography package [[1](https://github.com/pyca/cryptography/issues/5771#issuecomment-775016788), [2](https://cryptography.io/en/latest/faq/#why-does-cryptography-require-rust)].
 
 ```bash
 # Create and activate a virtual environment
