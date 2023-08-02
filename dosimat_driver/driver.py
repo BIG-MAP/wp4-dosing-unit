@@ -174,12 +174,7 @@ class Dosimat876:
 
     def _get_status(self) -> Status:
         response = self._serial.send_command(Command.status())
-        response = Response.from_string(response)
-        if response != Response.OK:
-            raise RuntimeError(f"Could not get status: {response}")
-
-        status = self._serial.read_line()
-        return Status.from_string(status)
+        return Status.from_string(response)
 
     def _get_response_for_command(self, command: str) -> Response:
         response = self._serial.send_command(command)

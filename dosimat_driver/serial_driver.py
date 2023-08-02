@@ -20,7 +20,7 @@ class SerialDriver:
     def send_command(self, command: str) -> str:
         self.serial.write((command + "\r\n").encode())
         self.serial.flush()
-        response = self.read_line()
+        response = self.serial.read_all().decode().strip()
         return response
 
     def read_line(self) -> str:
