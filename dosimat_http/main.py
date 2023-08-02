@@ -28,6 +28,9 @@ class APIResponse:
     message: Optional[str] = None
     error: Optional[str] = None
 
+    def json(self):
+        return self.__dict__
+
 
 @app.get("/dosimats")
 async def list_dosimats() -> APIResponse:
@@ -47,7 +50,7 @@ async def get_status(id: int):
     if dosimat is None:
         return JSONResponse(
             status_code=404,
-            content=APIResponse(error=f"Could not find dosimat with id {id}"),
+            content=APIResponse(error=f"Could not find dosimat with id {id}").json(),
         )
 
     is_ready = dosimat.is_ready()
@@ -68,7 +71,7 @@ async def dispense(id: int, ml: float, background_tasks: BackgroundTasks):
     if dosimat is None:
         return JSONResponse(
             status_code=404,
-            content=APIResponse(error=f"Could not find dosimat with id {id}"),
+            content=APIResponse(error=f"Could not find dosimat with id {id}").json(),
         )
 
     try:
@@ -77,7 +80,7 @@ async def dispense(id: int, ml: float, background_tasks: BackgroundTasks):
     except Exception as e:
         return JSONResponse(
             status_code=500,
-            content=APIResponse(error=f"Could not dispense: {e}"),
+            content=APIResponse(error=f"Could not dispense: {e}").json(),
         )
 
 
@@ -90,7 +93,7 @@ async def stop(id: int, background_tasks: BackgroundTasks):
     if dosimat is None:
         return JSONResponse(
             status_code=404,
-            content=APIResponse(error=f"Could not find dosimat with id {id}"),
+            content=APIResponse(error=f"Could not find dosimat with id {id}").json(),
         )
 
     try:
@@ -99,7 +102,7 @@ async def stop(id: int, background_tasks: BackgroundTasks):
     except Exception as e:
         return JSONResponse(
             status_code=500,
-            content=APIResponse(error=f"Could not stop: {e}"),
+            content=APIResponse(error=f"Could not stop: {e}").json(),
         )
 
 
