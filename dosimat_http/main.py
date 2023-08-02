@@ -39,7 +39,7 @@ async def list_dosimats() -> APIResponse:
 
 
 @app.get("/dosimats/{id}/status")
-async def get_status(id: int) -> Union[APIResponse, JSONResponse]:
+async def get_status(id: int):
     """
     Returns the status of the dosing unit.
     """
@@ -55,9 +55,7 @@ async def get_status(id: int) -> Union[APIResponse, JSONResponse]:
 
 
 @app.post("/dosimats/{id}/dispense", status_code=202)
-async def dispense(
-    id: int, ml: float, background_tasks: BackgroundTasks
-) -> Union[APIResponse, JSONResponse]:
+async def dispense(id: int, ml: float, background_tasks: BackgroundTasks):
     """
     Dispenses the given volume of liquid.
     """
