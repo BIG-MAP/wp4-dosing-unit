@@ -14,6 +14,8 @@ class SerialDriver:
             xonxoff=True,  # Software-Handshake
             rtscts=False,
             dsrdtr=False,
+            timeout=5,
+            exclusive=True,
         )
         time.sleep(1)
 
