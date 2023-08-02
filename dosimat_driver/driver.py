@@ -132,7 +132,7 @@ class Dosimat876:
         try:
             self._load_method(ml=ml)
             self._dispense()
-            self._wait_until_done
+            self._wait_until_done()
         except Exception as e:
             self._logger.exception(e)
 
