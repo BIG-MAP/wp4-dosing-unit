@@ -2,8 +2,8 @@
 
 This repository contains:
 
-- The [driver](./driver/) for the dosing unit Dosimat 876 Plus that uses the serial port for communication.
-- The [HTTP server](./http/) that provides a REST API to control the dosing unit.
+- The [driver](./dosimat_driver/) for the dosing unit Dosimat 876 Plus that uses the serial port for communication.
+- The [HTTP server](./dosimat_http/) that provides a REST API to control the dosing unit.
 
 ## Getting Started
 
@@ -15,6 +15,7 @@ python -m venv .venv
 source .venv/bin/activate
 
 # Install the packages
+pip install -r requirements.txt
 python setup.py install
 
 # Run the manual test
@@ -24,10 +25,10 @@ python tests/manual_driver_test.py
 To start an HTTP server, run:
 
 ```bash
-SERIAL_PORT_1=/dev/ttyUSB0 uvicorn dosimat_http.main:app --host "0.0.0.0" --port 8080
+DOSIMAT_SERIAL_PORT_1=/dev/ttyUSB0 uvicorn dosimat_http.main:app --host "0.0.0.0" --port 8080
 ```
 
-It's expected to have 6 dosing units connected together through LogiLink. Specify environment variables `SERIAL_PORT_1` to `SERIAL_PORT_6` to configure the serial ports, e.g., `SERIAL_PORT_1=/dev/ttyUSB0`.
+It's expected to have 6 dosing units connected together through LogiLink. Specify environment variables `DOSIMAT_SERIAL_PORT_1` to `DOSIMAT_SERIAL_PORT_6` to configure the serial ports, e.g., `DOSIMAT_SERIAL_PORT_1=/dev/ttyUSB0`.
 
 To query the status of the dosing units, run:
 
